@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STEM Prototype</title>
+    <style>
+        :root {
+            --bg-color: #F8F8F8;
+            --text-color: #333333;
+            --border-color: #E0E0E0;
+            --primary-accent: #000000; 
+            --secondary-text: #888888;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex; 
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh; 
+        }
+
+        .container {
+            max-width: 1000px; 
+            background-color: #FFFFFF;
+            border: 1px solid var(--border-color);
+            padding: 40px;
+            display: grid; 
+            grid-template-columns: 1fr 1fr;
+            gap: 40px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--primary-accent);
+        }
+
+        p.subtitle {
+            font-size: 15px;
+            color: var(--secondary-text);
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 500;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* Left Panel */
+        .panel-left {
+            /* Removed border-right to keep it simple, as it creates an uneven gap due to the grid column gap */
+            /* border-right: 1px solid var(--border-color); */
+            padding-right: 40px; 
+        }
+        
+        input[type="file"] {
+            display: block;
+            margin-bottom: 15px;
+            padding: 5px; 
+            border: 1px solid var(--border-color); 
+            background-color: #F0F0F0;
+        }
+
+        p.file-info {
+            font-size: 14px;
+            color: var(--secondary-text);
+            margin-bottom: 30px;
+        }
+        
+        p.file-info strong {
+            color: var(--text-color);
+        }
+
+        /* Buttons */
+        button {
+            background-color: var(--primary-accent);
+            color: #FFFFFF;
+            border: none;
+            padding: 12px 25px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            display: block; 
+            width: fit-content; 
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #555555; 
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background-color: #CCCCCC;
+            cursor: not-allowed;
+        }
+
+        /* Right Panel */
+        .panel-right {
+            padding-left: 0; 
+        }
+
+        /* Loader */
+        #loader {
+            display: none;
+            padding: 15px;
+            border: 1px dashed var(--secondary-text);
+            color: var(--secondary-text);
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        /* Output Card */
+        #output {
+            display: none;
+            padding: 30px;
+            border: 1px solid var(--primary-accent); 
+            background-color: #FFFFFF;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        #output p {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        #output p strong {
+            color: var(--primary-accent);
+        }
+
+        #output button.option { 
+            background-color: #F8F8F8;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            width: 100%;
+            text-align: left;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        #output button.option:hover {
+            background-color: #EFEFEF;
+            transform: none; 
+        }
+
+        #output button.option[data-status="correct"] {
+            border-color: green;
+        }
+        #output button.option[data-status="incorrect"] {
+            border-color: red;
+            /* text-decoration: line-through; // Removed for better UX in a multi-choice context */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="panel-left">
+            <h1>AC innovation Project: CONCEPT!</h1>
+            <p class="subtitle">Project Concept Prototype</p>
+            
+            <h2>[1] Source Material</h2>
+            
+            <p><strong>Upload content here:</strong></p>
+            <input type="file" id="sourceFile" accept=".txt,.pdf,.docx" onchange="displayFileName()">
+            
+            <p class="file-info">Selected File: <strong id="fileNameDisplay">-- No file chosen --</strong></p>
+            
+            <button id="transformButton" onclick="runSimulation()">Generate Lesson</button>
+        </div>
+
+        <div class="panel-right">
+            <h2>[2] Learning </h2>
+            
+            <div id="loader">
+                PROCESSING: Analyzing Source Material and Generating Interaction Modules...
+            </div>
+
+            <div id="output">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function displayFileName() {
+            const fileInput = document.getElementById('sourceFile');
+            const display = document.getElementById('fileNameDisplay');
+            const transformButton = document.getElementById('transformButton');
+            
+            if (fileInput.files.length > 0) {
+                // BUG FIX: Removed the lines that reset the display and disable the button.
+                
+                // 1. Display file name
+                display.textContent = fileInput.files[0].name;
+                
+                // 2. Enable button and set text
+                transformButton.innerHTML = 'Generate Lesson';
+                transformButton.disabled = false;
+
+                // 3. Reset transformation feedback appearance
+                transformButton.style.color = '#FFFFFF'; // Reset color from green/red
+                
+                // 4. Hide previous output/loader on new file selection
+                document.getElementById('output').style.display = 'none'; 
+                document.getElementById('loader').style.display = 'none';
+
+            } else {
+                // Handle case where file selection is canceled or cleared
+                display.textContent = '-- No file chosen --';
+                transformButton.innerHTML = 'Generate Lesson';
+                transformButton.disabled = true;
+                transformButton.style.color = '#FFFFFF';
+            }
+        }
+
+        function runSimulation() {
+            const fileInput = document.getElementById('sourceFile');
+            const btn = document.getElementById('transformButton');
+            const loader = document.getElementById('loader');
+            const output = document.getElementById('output');
+            
+            if (fileInput.files.length === 0) {
+                alert("Please select a file to  Generate.");
+                return;
+            }
+
+            // 1. Reset & Disable
+            output.style.display = 'none';
+            btn.disabled = true;
+            btn.style.color = ''; 
+            btn.style.backgroundColor = 'var(--primary-accent)'; // Ensure button returns to default background
+
+            // 2. Show Loading State
+            loader.style.display = 'block';
+            btn.innerHTML = "PROCESSING...";
+
+            // 3. Simulate processing time (1.5s)
+            setTimeout(() => {
+                loader.style.display = 'none';
+                
+                // 4. Inject the Ideal Output (Hardcoded Concept)
+                const conceptOutput = `
+                    <p><strong>[MODULE GENERATED]</strong></p>
+                    <p><strong>FOCUS: Contextual Recall</strong></p>
+                    <p>Based on the uploaded document (<strong style="font-style: italic;">${fileInput.files[0].name}</strong>): "กบร้องเป็นเสียงแบบไหน?"</p>
+                    
+                    <button class="option" onclick="selectOption(this, 'wrong')">A. อ็อบ</button>
+                    <button class="option" onclick="selectOption(this, 'correct')">B. อบ อบ</button>
+                    <button class="option" onclick="selectOption(this, 'wrong')">C. oppa gangnam style</button>
+                `;
+                
+                output.innerHTML = conceptOutput;
+                output.style.display = 'block';
+
+                // 5. Final UI Feedback
+                btn.innerHTML = "GENERATE COMPLETE";
+                btn.disabled = false; // Allow re-transformation
+                btn.style.color = 'green';
+                btn.style.backgroundColor = 'var(--primary-accent)'; // Maintain default background color
+            }, 1500);
+        }
+
+        function selectOption(element, status) {
+            // Disable all options after one is clicked
+            const allOptions = element.parentNode.querySelectorAll('.option');
+            allOptions.forEach(opt => opt.disabled = true);
+
+            if (status === 'correct') {
+                element.innerHTML += " &nbsp;— &nbsp;CORRECT";
+                element.style.borderColor = 'green';
+                element.style.backgroundColor = '#e6ffe6'; 
+                element.setAttribute('data-status', 'correct');
+            } else {
+                element.innerHTML += " &nbsp;— &nbsp;INCORRECT";
+                element.style.borderColor = 'red';
+                element.style.backgroundColor = '#ffe6e6';
+                element.setAttribute('data-status', 'incorrect');
+                
+                // Also highlight the correct answer in green for user feedback
+                allOptions.forEach(opt => {
+                    if (opt.getAttribute('onclick').includes("'correct'")) {
+                        opt.style.borderColor = 'green';
+                        opt.style.backgroundColor = '#e6ffe6';
+                    }
+                });
+            }
+        }
+
+        // Initialize button state on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('transformButton').disabled = true;
+        });
+
+    </script>
+</body>
+</html>
