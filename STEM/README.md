@@ -390,4 +390,4 @@ For issues or questions:
 
 **Built with 🧠 by AI Agents | Powered by GPT-4o & Streamlit**
 
-*Made with ❤️ for educators and learners everywhere*
+*Made by EeSaRa Dev Team
