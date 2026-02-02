@@ -75,7 +75,7 @@ mkdir templates
 
 Your project structure should look like:
 ```
-pdf-game-factory/
+./
 ├── app.py
 ├── requirements.txt
 ├── .env
@@ -185,7 +185,7 @@ The color is determined by AI Agent 2 during game design.
 ## 📁 Project Structure
 
 ```
-pdf-game-factory/
+./
 ├── app.py                      # Main Streamlit application
 ├── templates/                  # Game HTML templates (REQUIRED)
 │   ├── matching_game.html      # Matching pairs game
